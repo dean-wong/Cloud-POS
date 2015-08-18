@@ -1,0 +1,22 @@
+/*
+ * Globals
+ */
+
+
+/*
+ * Base structure
+ */
+body {
+  min-height: 1000px; 
+  padding-top: 70px; 
+}
+
+/*
+ * Footer
+ */
+
+.footer {
+  color: #999; /* IE8 proofing */
+  text-align: center;
+  color: rgba(255,255,255,.5);
+}
