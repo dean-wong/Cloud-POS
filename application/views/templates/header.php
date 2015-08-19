@@ -7,11 +7,14 @@
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
     <title><?= $title ?></title>
     <!-- 新 Bootstrap 核心 CSS 文件 -->
-    <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
     <!-- 可选的Bootstrap主题文件（一般不用引入） -->
-    <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet"> -->
+    <link href="<?= base_url('assets/css/bootstrap-theme.min.css') ?>" rel="stylesheet">
 
-    <link href="//cdn.bootcss.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- <link href="//cdn.bootcss.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet"> -->
+    <link href="<?= base_url('assets/css/font-awesome.min.css') ?>" rel="stylesheet">
     
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="<?= base_url('assets/css/patch.css') ?>" >
@@ -20,7 +23,7 @@
   </head>
 
   <body>
-    <nav class="navbar navbar-fixed-top navbar-default">
+    <nav class="navbar navbar-fixed-top navbar-inverse">
       <div class="container">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
@@ -30,7 +33,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> 云POS</a>
+          <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> Cloud POS</a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse">

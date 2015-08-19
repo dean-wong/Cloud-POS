@@ -1,14 +1,14 @@
 <!-- Begin page content -->
 <div class="container">
   <ul class="nav navbar-default nav-tabs">
-    <li role="presentation" class="<?= $title == 'Overview'?'active':'inactive' ?>">
-      <a href="#">全部餐桌</a>
+    <li role="presentation" class="<?= $filter == 'all'?'active':'inactive' ?>">
+      <a href="<?= base_url('index.php/pos/overview/all')?>">全部餐桌</a>
     </li>
-    <li role="presentation" class="<?= $title == ' '?'active':'inactive' ?>">
-      <a href="#">已开台</a>
+    <li role="presentation" class="<?= $filter == 'opened'?'active':'inactive' ?>">
+      <a href="<?= base_url('index.php/pos/overview/opened')?>">已开台</a>
     </li>
-    <li role="presentation" class="<?= $title == ' '?'active':'inactive' ?>">
-      <a href="#">未开台</a>
+    <li role="presentation" class="<?= $filter == 'closed'?'active':'inactive' ?>">
+      <a href="<?= base_url('index.php/pos/overview/closed')?>">未开台</a>
     </li>
   </ul> <!-- end of nav-tabs -->
 
@@ -25,13 +25,12 @@
 
               if ($item['ticket'] != null) {
                 $thumb_style = ' style="background: #dff0d8"';
-                $caption = '￥188.00';
+                $caption = '￥' . number_format($item['total_price'], 2);//'￥188.00';
                 $table_url = base_url('index.php/pos/ticket') . '/' . $item['ticket'];
-                $description = '开台时间：' . date('H:m:s');
+                $description = '开台时间：' . date('H:m:s', strtotime($item['create_time']));
               }
 
               echo '<div class="thumbnail" '. $thumb_style .'>';
-              // echo '<a href="#" class="thumbnail" '. $thumb_style .'>';
               echo '<span class="glyphicon glyphicon-th" aria-hidden="true"></span> ' . $item['name'];
 
               echo '<a href="'.$table_url.'"><h3 class="text-center">' . $caption . '</h3></a>';
