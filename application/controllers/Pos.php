@@ -6,7 +6,7 @@ class Pos extends CI_Controller {
     {
         parent::__construct();
 
-        $this->load->model('dinnigtable_model');
+        $this->load->model('dinningtable_model');
         // $this->load->helper('url_helper');
     }
 
@@ -25,17 +25,21 @@ class Pos extends CI_Controller {
     {
         $data['title'] = 'Overview';
         $data['filter'] = $filter;
-        $data['tables'] = $this->dinnigtable_model->get_AllTables($filter);
+        $data['tables'] = $this->dinningtable_model->get_AllTables($filter);
 
         $this->load->view('templates/header', $data);
         $this->load->view('pos/overview', $data);
         $this->load->view('templates/footer', $data);
     }
 
+    /*
+     * 查看订单详情
+     * id = ticket_id
+     */
     public function ticket($id)
     {
         $data['title'] = 'Ticket';
-        $date['ticket'] = $this->dinnigtable_model->get_Ticket($id);
+        $data['ticket'] = $this->dinningtable_model->get_Ticket($id);
 
         $this->load->view('templates/header', $data);
         $this->load->view('pos/ticket', $data);
@@ -51,14 +55,14 @@ class Pos extends CI_Controller {
 
         if ($this->form_validation->run() === FALSE)
         {
-            $this->load->view('templates/header', $data);
-            $this->load->view('pos/create');
-            $this->load->view('templates/footer');
+//            $this->load->view('templates/header', $data);
+//            $this->load->view('pos/create');
+//            $this->load->view('templates/footer');
 
         }
         else
         {
-            // $this->dinnigtable_model->set_news();
+            // $this->dinningtable_model->set_news();
             // $this->load->view('news/success');
         }
     }

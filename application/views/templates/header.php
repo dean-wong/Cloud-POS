@@ -9,6 +9,7 @@
     <!-- 新 Bootstrap 核心 CSS 文件 -->
     <!-- <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="<?= base_url('assets/css/bootstrap.min.css') ?>" rel="stylesheet">
+
     <!-- 可选的Bootstrap主题文件（一般不用引入） -->
     <!-- <link href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" rel="stylesheet"> -->
     <link href="<?= base_url('assets/css/bootstrap-theme.min.css') ?>" rel="stylesheet">
@@ -19,6 +20,7 @@
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="<?= base_url('assets/css/patch.css') ?>" >
     <link rel="stylesheet" href="<?= base_url('assets/css/cover.css') ?>" >
+    <link rel="stylesheet" href="<?= base_url('assets/css/buttons.css') ?>" >
 
   </head>
 
