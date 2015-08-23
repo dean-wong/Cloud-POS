@@ -1,16 +1,17 @@
 <?php
 
-class Dinningtable_model extends CI_Model {
-    
-    public function __construct() 
+class Dinningtable_model extends CI_Model
+{
+
+    public function __construct()
     {
         $this->load->database();
     }
-    
+
     /*
      * filter = all, opened, closed.
      */
-    public function get_AllTables($filter = 'all') 
+    public function get_AllTables($filter = 'all')
     {
         $query = $this->db->get('shop_table');
 
@@ -20,37 +21,24 @@ class Dinningtable_model extends CI_Model {
             $ticket_id = $this->findTicketIDByTable($row['id']);
             $is_opened = !is_null($ticket_id);
 
-            if ($filter == 'opened' && $is_opened){
-                $items[] = [
-                    'name' => $row['name'], 
-                    'capacity' => $row['capacity'],
-                    'ticket' =>  $ticket_id, 
-                    'total_price' => $this->findTicket($ticket_id)['total_price'],
-                    'create_time' => $this->findTicket($ticket_id)['create_time'],
-                ];
-            }
-            else if ($filter == 'closed' && (!$is_opened)){
-                $items[] = [
-                    'name' => $row['name'], 
-                    'capacity' => $row['capacity'],
-                    'ticket' =>  $ticket_id, 
-                    'total_price' => 0.00,
-                    'create_time' => null,
-                ];
+            $item = [
+                'id' => $row['id'],
+                'name' => $row['name'],
+                'capacity' => $row['capacity'],
+                'ticket' => $ticket_id,
+                'total_price' => $is_opened ? $this->findTicket($ticket_id)['total_price'] : 0.00,
+                'create_time' => $is_opened ? $this->findTicket($ticket_id)['create_time'] : null,
+            ];
 
-            }
-            else if ($filter == 'all'){
-                
-                $items[] = [
-                    'name' => $row['name'], 
-                    'capacity' => $row['capacity'],
-                    'ticket' =>  $ticket_id, 
-                    'total_price' => $is_opened?$this->findTicket($ticket_id)['total_price']:0.00,
-                    'create_time' => $is_opened?$this->findTicket($ticket_id)['create_time']:null,
-                ];
+            if ($filter == 'opened' && $is_opened) {
+                $items[] = $item;
+            } else if ($filter == 'closed' && (!$is_opened)) {
+                $items[] = $item;
+            } else if ($filter == 'all') {
+                $items[] = $item;
             }
         }
-        
+
         return $items;
     }
 
@@ -63,7 +51,8 @@ class Dinningtable_model extends CI_Model {
         $result = array();
         $ticket = $this->findTicket($id);
 
-        if (!empty($ticket)){
+        if (!empty($ticket)) {
+            $result['id'] = $id;
             // 订单价格
             $result['total_price'] = $ticket['total_price'];
 
@@ -85,6 +74,21 @@ class Dinningtable_model extends CI_Model {
 
     /**
      * @param $ticket_id
+     * @param $table_id
+     */
+    public function change_TicketTable($ticket_id, $table_id)
+    {
+        $data = array(
+            'ticket_id' => $ticket_id,
+            'table_id' => $table_id,
+        );
+
+        $this->db->where('ticket_id', $ticket_id);
+        $this->db->update('ticket_table', $data);
+    }
+
+    /**
+     * @param $ticket_id
      * @return Ticket object
      */
     private function findTicket($ticket_id)
@@ -94,13 +98,14 @@ class Dinningtable_model extends CI_Model {
         ));
 
         return $query->row_array();
-    }   
+    }
 
 
     /*
      * Param table_id
      */
-    private function findTable($table_id) {
+    private function findTable($table_id)
+    {
         $query = $this->db->get_where('shop_table', array(
             'id' => $table_id
         ));
@@ -112,15 +117,16 @@ class Dinningtable_model extends CI_Model {
      * @param $table_id
      * @return Ticket id.
      */
-    private function findTicketIDByTable($table_id) {
+    private function findTicketIDByTable($table_id)
+    {
         $query = $this->db->get_where('ticket_table', array(
             'table_id' => $table_id
         ));
-        if ($query->num_rows() < 1) 
+        if ($query->num_rows() < 1)
             return null; //invalid id
 
         $row = $query->first_row();
-        
+
         return $row->ticket_id;
     }
 
@@ -128,15 +134,16 @@ class Dinningtable_model extends CI_Model {
      * param Ticket id
      * return Table id
     */
-    private function findTableIDByTicket($ticket_id) {
+    private function findTableIDByTicket($ticket_id)
+    {
         $query = $this->db->get_where('ticket_table', array(
             'ticket_id' => $ticket_id
         ));
-        if ($query->num_rows() < 1) 
+        if ($query->num_rows() < 1)
             return null; //invalid id
 
         $row = $query->first_row();
-        
+
         return $row->table_id;
     }
 

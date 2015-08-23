@@ -6,8 +6,9 @@ class Pos extends CI_Controller {
     {
         parent::__construct();
 
+//        $this->load->library('table'); //HTML 表格类
+
         $this->load->model('dinningtable_model');
-        // $this->load->helper('url_helper');
     }
 
     public function index()
@@ -41,9 +42,19 @@ class Pos extends CI_Controller {
         $data['title'] = 'Ticket';
         $data['ticket'] = $this->dinningtable_model->get_Ticket($id);
 
+        // 未开台的桌子，给转台功能使用
+        $data['tables_closed'] = $this->dinningtable_model->get_AllTables('closed');
+
         $this->load->view('templates/header', $data);
         $this->load->view('pos/ticket', $data);
         $this->load->view('templates/footer', $data);
+    }
+
+    public function change_table($ticket_id, $table_id)
+    {
+        $this->dinningtable_model->change_TicketTable($ticket_id, $table_id);
+        redirect('pos/overview/all');
+
     }
 
     public function create()
