@@ -20,22 +20,21 @@
                     <div class="col-xs-6 col-md-2">
                         <?php
                         $thumb_style = '';
-                        $caption = '开台';
-                        $table_url = '#';
+                        $caption = $item['name'];
+                        $table_url = site_url('/pos/create') . '/' . $item['id']; // 默认是开台，参数是Table ID
                         $description = '可容纳 ' . $item['capacity'] . '人';
 
                         if ($item['ticket'] != null) {
                             $thumb_style = ' style="background: #c1e2b3"';
                             $caption = '￥' . number_format($item['total_price'], 2);//'￥188.00';
                             $table_url = site_url('/pos/ticket') . '/' . $item['ticket'];
-                            $description = '开台时间：' . date('H:m:s', strtotime($item['create_time']));
+                            $description = '时间：' . date('H:m:s', strtotime($item['create_time']));
                         }
                         ?>
 
                         <div class="thumbnail" <?= $thumb_style ?> >
                             <span class="glyphicon glyphicon-th" aria-hidden="true"></span><?= $item['name'] ?>
                             <a href="<?= $table_url ?>"><h3 class="text-center"><?= $caption ?></h3></a>
-
                             <p><?= $description ?></p>
                         </div>
                     </div>

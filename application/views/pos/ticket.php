@@ -7,9 +7,6 @@
                 <a href="#" class="button button-rounded button-glow button-caution">
                     <i class="fa fa-shopping-cart"></i> 加菜</a>
             </div>
-            <!--            <a href="#ChangeTableModal" class="button button-rounded button-glow button-royal"-->
-            <!--               data-toggle="modal" data-whatever="@fat">-->
-            <!--                <i class="fa fa-table"></i> 转台</a>-->
             <!-- Single button -->
             <div class="btn-group">
                 <button type="button" class="button button-rounded button-glow button-royal dropdown-toggle"
@@ -17,14 +14,12 @@
                     <i class="fa fa-table"></i> 转台<span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-<!--                    <li role="separator" class="divider"></li>-->
-
-                    <?php foreach($tables_closed as $table) : ?>
+                    <?php foreach ($tables_closed as $table) : ?>
                         <?php $table_url = site_url('/pos/change_table') . '/' . $ticket['id'] . '/' . $table['id']; ?>
 
                         <li><a href="<?= $table_url ?>"><?= $table['name'] ?></a></li>
                     <?php endforeach; ?>
-<!--                    <li role="separator" class="divider"></li>-->
+                    <!-- <li role="separator" class="divider"></li>-->
                 </ul>
             </div>
             <div class="btn-group">
@@ -54,28 +49,42 @@
                     <th> 菜品</th>
                     <th> 价格</th>
                     <th> 数量</th>
-                    <th> 单位</th>
                     <th> 金额</th>
                     <th> 状态</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <tr class="success">
-                    <td> 1</td>
-                    <td> 酱汁萝卜皮</td>
-                    <td> 8.0</td>
-                    <td> 2</td>
-                    <td> 份</td>
-                    <td> 16.00</td>
-                    <td> 已上</td>
+                <?php foreach($ticket['menu_items'] as $menu) : ?>
+                    <?php
+                    $is_refunded = !empty($menu['refunded']);   // 退单
+                    $is_settled = !empty($menu['settled']);     // 已经解决
+                    $status = '正常';
+                    $class_type = '';
+                    if ($is_settled) {
+                        $class_type = 'class="success"';
+                        $status = '已上菜';
+                    }
+                    if ($is_refunded){
+                        $class_type = 'class="danger" style="text-decoration: line-through;"';
+                        $status = '退单';
+                    }
+                    ?>
+                <tr <?= $class_type ?>>
+                    <td><?= $menu['id'] ?></td>
+                    <td><?= $menu['name'] ?></td>
+                    <td><?= number_format($menu['price'], 2) ?></td>
+                    <td><?= $menu['count'] ?></td>
+                    <td><?= number_format($menu['total_price'], 2) ?></td>
+                    <td><?= $status ?></td>
                 </tr>
+                <?php endforeach; ?>
+
                 <tr class="warning">
                     <td> 2</td>
                     <td> 冻柠乐</td>
                     <td> 6.0</td>
                     <td> 1</td>
-                    <td> 份</td>
                     <td> 6.00</td>
                     <td> 等待过久</td>
                 </tr>
@@ -84,7 +93,6 @@
                     <td> 米饭</td>
                     <td> 1.0</td>
                     <td> 3</td>
-                    <td> 份</td>
                     <td> 3.00</td>
                     <td> 退单</td>
                 </tr>
@@ -93,13 +101,11 @@
                     <td> 烤羊肉</td>
                     <td> 18.0</td>
                     <td> 1</td>
-                    <td> 份</td>
                     <td> 18.00</td>
                     <td> 正常</td>
                 </tr>
                 <tr>
                     <td>合计</td>
-                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>

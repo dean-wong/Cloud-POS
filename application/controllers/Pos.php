@@ -16,7 +16,7 @@ class Pos extends CI_Controller {
         $data['title'] = 'My Site';
         $this->load->view('templates/header', $data);
         $this->load->view('pos/index', $data);
-        $this->load->view('templates/footer', $data);
+        $this->load->view('templates/footer');
     }
 
     /*
@@ -30,7 +30,7 @@ class Pos extends CI_Controller {
 
         $this->load->view('templates/header', $data);
         $this->load->view('pos/overview', $data);
-        $this->load->view('templates/footer', $data);
+        $this->load->view('templates/footer');
     }
 
     /*
@@ -47,7 +47,7 @@ class Pos extends CI_Controller {
 
         $this->load->view('templates/header', $data);
         $this->load->view('pos/ticket', $data);
-        $this->load->view('templates/footer', $data);
+        $this->load->view('templates/footer');
     }
 
     public function change_table($ticket_id, $table_id)
@@ -57,18 +57,22 @@ class Pos extends CI_Controller {
 
     }
 
-    public function create()
+    /**
+     * @param $table_id
+     */
+    public function create($table_id = 0)
     {
         $data['title'] = 'Create a ticket item';
+        $data['menu_categories'] = $this->dinningtable_model->get_AllMenuCategory();
 
-        $this->form_validation->set_rules('title', 'Title', 'required');
-        $this->form_validation->set_rules('text', 'text', 'required');
+        //$this->form_validation->set_rules('title', 'Title', 'required');
+        //$this->form_validation->set_rules('text', 'text', 'required');
 
         if ($this->form_validation->run() === FALSE)
         {
-//            $this->load->view('templates/header', $data);
-//            $this->load->view('pos/create');
-//            $this->load->view('templates/footer');
+            $this->load->view('templates/header', $data);
+            $this->load->view('pos/create', $data);
+            $this->load->view('templates/footer');
 
         }
         else
@@ -83,7 +87,7 @@ class Pos extends CI_Controller {
         $data['title'] = 'Order';
         $this->load->view('templates/header', $data);
         $this->load->view('pos/order', $data);
-        $this->load->view('templates/footer', $data);
+        $this->load->view('templates/footer');
     }
 
     public function cashier()
@@ -91,6 +95,6 @@ class Pos extends CI_Controller {
         $data['title'] = 'Cashier';
         $this->load->view('templates/header', $data);
         $this->load->view('pos/cashier', $data);
-        $this->load->view('templates/footer', $data);
+        $this->load->view('templates/footer');
     }
 }
