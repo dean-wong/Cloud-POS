@@ -1,108 +1,148 @@
+<?php
+require_once(__DIR__ . '/../../models/Ticket.php');
+?>
+
 <div class="container">
     <div class="row">
 
-        <div class="col-xs-4">
-            <form>
-                <fieldset>
-                    <legend>表单项</legend>
-                    <label>表签名</label><input type="text"/>
-                    <span class="help-block">这里填写帮助信息.</span>
-                    <label class="checkbox"><input type="checkbox"/> 勾选同意</label>
-                    <button type="submit" class="btn">提交</button>
-                </fieldset>
+        <div class="col-xs-3">
+
+            <?php $error_validmsg = validation_errors(); ?>
+            <?php if (!empty($error_validmsg)) : ?>
+                <div class="alert alert-warning" role="alert"><?= $error_validmsg ?></div>
+            <?php endif; ?>
+            <?= form_open("pos/create/$new_ticket->_table_id") ?>
+            <fieldset>
+
+                <div id="legend" class="">
+                    <legend class="">开台 <?= $new_ticket->_table_name ?></legend>
+                    <span class="help-block">当前时间：<?= $new_ticket->_create_time ?></span>
+                </div>
+
+                <div class="control-group">
+                    <label class="sr-only"  for="menu_count">点菜</label>
+                    <input  class="sr-only"  type="input" name="menu_count" id="menu_count" value=""/>
+
+                    <label class="control-label" for="menu-list"><h4>菜单</h4></label>
+                    <div class="controls">
+                        <div class="list-group" name="menu-list" id="menu-list">
+                            <?php $item_colos = ['list-group-item-success', 'list-group-item-info', 'list-group-item-warning', 'list-group-item-danger']; ?>
+                            <?php foreach ($new_ticket->_items as $item) : ?>
+                                <div class="list-group-item <?= $item_colos[($item['menu_id']) % 4] ?>" value="<?= $item['menu_id'] ?>">
+                                    <span class="badge"><?= $item['menu_count'] ?></span>
+                                    <h4 class="list-group-item-heading"><?= $item['name'] ?></h4>
+                                    <p class="list-group-item-text">￥<?= number_format($item['total_price'], 2) ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="control-group">
+                    <h4>总金额：<?= $new_ticket->_total_price ?><small> 优惠金额：<?= $new_ticket->_discount ?></small></h4>
+
+                    <label class="sr-only control-label">Check In</label>
+                    <!-- Button -->
+                    <div class="controls">
+                        <button class="btn btn-success btn-block">下单</button>
+                    </div>
+                </div>
+
+            </fieldset>
             </form>
         </div>
 
-        <div class="col-xs-8">
-
-            <!-- Tabs -->
-
-                <!--start combinations-->
-                <div id="tabs3">
-                    <ul>
-                        <li><a href="#tabs3-1">First</a></li>
-                        <li><a href="#tabs3-2">Second</a></li>
-                        <li><a href="#tabs3-3">Third</a></li>
-                    </ul>
-                    <div id="tabs3-1">
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eget diam nec urna hendrerit tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum aliquam ligula non nulla cursus volutpat. Aliquam malesuada felis nec turpis auctor interdum. Cras et lobortis dolor. Nam sodales, dolor eu cursus faucibus, justo leo vestibulum turpis, id malesuada erat ipsum et leo. Integer id aliquam augue. Proin quis risus magna.</p>
-                        <a href="#" id="sampleButton">Change</a>
-                    </div>
-                    <div id="tabs3-2">Tab 2</div>
-                    <div id="tabs3-3">Tab 3</div>
-                </div>
-                <!--end combinations-->
-
-                <!-- End tabs -->
-
+        <div class="col-xs-9">
 
             <div id="tabMenuCategory">
+                <ul class="nav nav-tabs">
+                    <?php $id_categories = array(); ?>
+                    <?php foreach ($menu_categories as $category) : ?>
+                        <li><a href="#tabMenuCategory-<?= $category['id'] ?>"><?= $category['name'] ?></a></li>
+                        <?php $id_categories[] = $category['id']; ?>
+                    <?php endforeach; ?>
+                </ul>
 
-            <ul class="nav navbar-default nav-tabs">
-<!--                <li class="active"><a href="#">全部</a></li>-->
-                <?php foreach ($menu_categories as $category) : ?>
-                    <li>
-                        <a href="#tabMenuGroup"><?= $category['name'] ?></a>
-                    </li>
+                <?php foreach ($id_categories as $id_category) : ?>
+                    <div id="tabMenuCategory-<?= $id_category ?>">
+                        <ul class="nav nav-tabs">
+                            <?php $id_groups = array(); ?>
+                            <?php foreach ($menu_categories as $category) : ?>
+                                <?php if ($category['id'] == $id_category) : ?>
+                                    <?php foreach ($category['menu_groups'] as $menuGroup) : ?>
+                                        <li>
+                                            <a href="#tabMenuGroup-<?= $menuGroup['id'] ?>"><?= $menuGroup['name'] ?></a>
+                                        </li>
+                                        <?php $id_groups[] = $menuGroup['id']; ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </ul>
+
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <?php foreach ($id_groups as $id_group) : ?>
+                                    <div id="tabMenuGroup-<?= $id_group ?>">
+                                        <div class="row">
+                                            <?php foreach ($menu_categories as $category) : ?>
+                                                <?php foreach ($category['menu_groups'] as $menuGroup) : ?>
+                                                    <?php if ($menuGroup['id'] == $id_group) : ?>
+                                                        <?php foreach ($menuGroup['menus'] as $menu) : ?>
+
+                                                            <div class="col-xs-6 col-md-3">
+                                                                <a href=javascript:addMenu('<?= $menu['id'] ?>','<?= $menu['name'] ?>','<?= number_format($menu['price'], 2) ?>')>
+<!--                                                                <a href=javascript:addMenu('1','2','3')>-->
+                                                                    <div class="thumbnail">
+                                                                        <img
+                                                                            src="http://ww3.sinaimg.cn/mw690/3e37e59cjw1evgxy5t7xqj20e80e8t9m.jpg"/>
+                                                                        <h4 class="text-center"><?= $menu['name'] ?>
+                                                                            <small>
+                                                                                ￥<?= number_format($menu['price'], 2) ?></small>
+                                                                        </h4>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+
+                                                        <?php endforeach; ?>
+                                                    <?php endif; ?>
+                                                <?php endforeach; ?>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                    </div>
                 <?php endforeach; ?>
 
-                <ul class="nav nav-tabs" id="tabMenuGroup">
-                    <li role="presentation" class="active"><a href="#">Home</a></li>
-                    <li role="presentation"><a href="#">Profile <span class="badge">42</span></a></li>
-                    <li role="presentation"><a href="#">Messages</a></li>
-                </ul>
-            </ul>
             </div>
+            <!-- end of tabMenuCategory -->
 
+            <!-- <nav>
+               <ul class="pagination">
+                 <li>
+                   <a href="#" aria-label="Previous">
+                     <span aria-hidden="true">&laquo;</span>
+                   </a>
+                 </li>
+                 <li><a href="#">1</a></li>
+                 <li><a href="#">2</a></li>
+                 <li><a href="#">3</a></li>
+                 <li><a href="#">4</a></li>
+                 <li><a href="#">5</a></li>
+                 <li>
+                   <a href="#" aria-label="Next">
+                     <span aria-hidden="true">&raquo;</span>
+                   </a>
+                 </li>
+               </ul>
+             </nav>-->
 
-            <div class=" panel panel-default">
-<!--                <div class="panel-heading">-->
-<!--                    <h3 class="panel-title">Panel title</h3>-->
-<!--                </div>-->
-
-                <div class="panel-body">
-
-                    <div class="row">
-                        <?php for ($i = 0; $i < 10; $i++) : ?>
-                            <div class="col-xs-6 col-md-3">
-                                <a href="#">
-                                    <div class="thumbnail">
-                                        <img src="http://docs.ebdoor.com/Image/ProductImage/0/1012/10120688_1.jpg"/>
-                                        <h4 class="text-center"> 草鱼
-                                            <small>￥78.00</small>
-                                        </h4>
-                                    </div>
-                                </a>
-                            </div>
-                        <?php endfor; ?>
-                    </div>
-                </div>
-                <div class="panel-footer">
-
-
-                </div>
-
-            </div>
-            <nav>
-                <ul class="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
 
         </div>
     </div>
 </div>
+
+

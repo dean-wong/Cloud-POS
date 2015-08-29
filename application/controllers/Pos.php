@@ -64,9 +64,9 @@ class Pos extends CI_Controller {
     {
         $data['title'] = 'Create a ticket item';
         $data['menu_categories'] = $this->dinningtable_model->get_AllMenuCategory();
+        $data['new_ticket'] = $this->dinningtable_model->create_Ticket($table_id);
 
-        //$this->form_validation->set_rules('title', 'Title', 'required');
-        //$this->form_validation->set_rules('text', 'text', 'required');
+        $this->form_validation->set_rules('menu_count', '点菜', 'required');
 
         if ($this->form_validation->run() === FALSE)
         {
@@ -77,8 +77,12 @@ class Pos extends CI_Controller {
         }
         else
         {
-            // $this->dinningtable_model->set_news();
-            // $this->load->view('news/success');
+            $items = $this->input->post('menu_items');  // 获得选择的菜单ID列表
+            $data['new_ticket']->addItems($items);
+            $data['new_ticket']->save();
+
+            redirect('pos/overview/all');
+
         }
     }
 

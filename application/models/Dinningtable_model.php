@@ -1,5 +1,7 @@
 <?php
 
+require_once('Ticket.php');
+
 class Dinningtable_model extends CI_Model
 {
 
@@ -42,7 +44,7 @@ class Dinningtable_model extends CI_Model
         return $items;
     }
 
-    public function get_AllMenuCategory(/*$filter = 'all'*/)
+    public function get_AllMenuCategory()
     {
         $query = $this->db->get('menu_category');
         $items = array();
@@ -50,9 +52,24 @@ class Dinningtable_model extends CI_Model
         foreach ($query->result_array() as $row) {
 
             if ($row['visible']){
+                $menu_groups = $this->findMenuGroups($row['id']);
+                $item_menu = array();
+
+                foreach ($menu_groups as $group){
+
+                    if ($group['visible']){
+                        $item_menu[] = [
+                            'id' => $group['id'],
+                            'name' => $group['name'],
+                            'menus' => $this->findMenuItems($group['id']),
+                        ];
+                    }
+                }
+
                 $items[] = [
                     'id' => $row['id'],
                     'name' => $row['name'],
+                    'menu_groups' => $item_menu,
                 ];
             }
 
@@ -115,14 +132,21 @@ class Dinningtable_model extends CI_Model
      */
     public function change_TicketTable($ticket_id, $table_id)
     {
-        $data = array(
+        $data = [
             'ticket_id' => $ticket_id,
             'table_id' => $table_id,
-        );
+        ];
 
         $this->db
             ->where('ticket_id', $ticket_id)
             ->update('ticket_table', $data);
+    }
+
+    public function create_Ticket($table_id)
+    {
+        $ticket = new Ticket($table_id);
+
+        return $ticket;
     }
 
     /**
@@ -134,6 +158,31 @@ class Dinningtable_model extends CI_Model
         $query = $this->db->get_where('ticket_item', array(
             'ticket_id' => $ticket_id,
         ));
+        return $query->result_array();
+    }
+
+    /**
+     * @param $category_id
+     * @return Menu group array
+     */
+    private function findMenuGroups($category_id)
+    {
+        $query = $this->db->get_where('menu_group', array(
+            'category_id' => $category_id,
+        ));
+        return $query->result_array();
+    }
+
+    /**
+     * @param $group_id
+     * @return Menu item array
+     */
+    private function findMenuItems($group_id)
+    {
+        $query = $this->db->get_where('menu_item', array(
+            'group_id' => $group_id,
+        ));
+
         return $query->result_array();
     }
 
@@ -179,6 +228,7 @@ class Dinningtable_model extends CI_Model
     /**
      * @param $table_id
      * @return Ticket id.
+     * 订单ID有多个，只返回没有清台的订单ID
      */
     private function findTicketIDByTable($table_id)
     {
@@ -188,9 +238,16 @@ class Dinningtable_model extends CI_Model
         if ($query->num_rows() < 1)
             return null; //invalid id
 
-        $row = $query->first_row();
+        foreach ($query->result() as $row)
+        {
+            $t = $this->findTicket ($row->ticket_id);
+            if (empty($t['settled'])){
+                return $row->ticket_id;
+            }
+        }
 
-        return $row->ticket_id;
+        return null;
+
     }
 
     /*
