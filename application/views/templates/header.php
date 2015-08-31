@@ -20,10 +20,13 @@
     <!-- JQuery UI -->
     <link href="<?= base_url('assets/css/custom-theme/jquery-ui-1.10.0.custom.css') ?>" rel="stylesheet">
 
+    <!-- third-party -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/buttons.css') ?>">
+<!--    <link rel="stylesheet" href="--><?//= base_url('assets/css/icheck-skins/all.css') ?><!--">-->
+
     <!-- Custom styles for this template -->
     <link rel="stylesheet" href="<?= base_url('assets/css/patch.css') ?>">
     <link rel="stylesheet" href="<?= base_url('assets/css/cover.css') ?>">
-    <link rel="stylesheet" href="<?= base_url('assets/css/buttons.css') ?>">
 
 </head>
 
@@ -48,13 +51,11 @@
                         href="<?= site_url('/pos/overview') ?>">
                         <span class="glyphicon glyphicon-th" aria-hidden="true"></span> 餐桌</a>
                 </li>
-                <li class="<?= $title == 'Order' ? 'active' : 'inactive' ?>"><a
-                        href="<?= site_url('/pos/order') ?>">
-                        <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> 点菜</a>
+                <li class="<?= $title == 'Order' ? 'active' : 'inactive' ?>">
+                    <a href=""><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> 点菜</a>
                 </li>
-                <li class="<?= $title == 'Cashier' ? 'active' : 'inactive' ?>"><a
-                        href="<?= site_url('/pos/cashier') ?>">
-                        <span class="glyphicon glyphicon-yen" aria-hidden="true"></span> 结账</a>
+                <li class="<?= $title == 'Cashier' ? 'active' : 'inactive' ?>">
+                    <a href=""><span class="glyphicon glyphicon-yen" aria-hidden="true"></span> 结账</a>
                 </li>
             </ul>
 

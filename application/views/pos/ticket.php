@@ -15,7 +15,7 @@
                 </button>
                 <ul class="dropdown-menu">
                     <?php foreach ($tables_closed as $table) : ?>
-                        <?php $table_url = site_url('/pos/change_table') . '/' . $ticket['id'] . '/' . $table['id']; ?>
+                        <?php $table_url = site_url('/pos/change_table') . '/' . $ticket->_id . '/' . $table['id']; ?>
 
                         <li><a href="<?= $table_url ?>"><?= $table['name'] ?></a></li>
                     <?php endforeach; ?>
@@ -23,23 +23,27 @@
                 </ul>
             </div>
             <div class="btn-group">
-
-                <a href="#" class="button button-glow button-rounded button-highlight">
+                <a href="#" class="button button-glow button-rounded button-capitalize">
+                    <i class="fa fa-print"></i> 打印台单</a>
+                <?php $cashier_url = site_url('/pos/cashier/') . '/' . $ticket->_id; ?>
+                <a href="<?= $cashier_url ?>" class="button button-glow button-rounded button-highlight">
                     <i class="fa fa-money"></i> 结账</a>
+                <a href="#" class="button button-glow button-rounded button-primary">
+                    <i class="fa fa-glass"></i> 清台</a>
             </div>
         </div>
 
 
         <div class="span12">
 
-            <h3><strong><?= $ticket['table_name'] ?></strong> 台单</h3>
+            <h3><strong><?= $ticket->_table_name ?></strong> 台单</h3>
 
             <p>
-                <strong>开台时间：</strong><?= $ticket['create_time'] ?>
+                <strong>开台时间：</strong><?= $ticket->_create_time ?>
             </p>
 
             <p>
-                <strong>顾客人数：</strong><?= $ticket['number_of_guests'] ?>
+                <strong>顾客人数：</strong><?= $ticket->_number_of_guests ?>
             </p>
 
             <table class="table table-striped table-condensed">
@@ -55,7 +59,7 @@
                 </thead>
 
                 <tbody>
-                <?php foreach($ticket['menu_items'] as $menu) : ?>
+                <?php foreach($ticket->_items as $menu) : ?>
                     <?php
                     $is_refunded = !empty($menu['refunded']);   // 退单
                     $is_settled = !empty($menu['settled']);     // 已经解决
@@ -72,14 +76,15 @@
                     ?>
                 <tr <?= $class_type ?>>
                     <td><?= $menu['id'] ?></td>
-                    <td><?= $menu['name'] ?></td>
-                    <td><?= number_format($menu['price'], 2) ?></td>
-                    <td><?= $menu['count'] ?></td>
+                    <td><?= $menu['menu_name'] ?></td>
+                    <td><?= number_format($menu['unit_price'], 2) ?></td>
+                    <td><?= $menu['menu_count'] ?></td>
                     <td><?= number_format($menu['total_price'], 2) ?></td>
                     <td><?= $status ?></td>
                 </tr>
                 <?php endforeach; ?>
 
+                <!--
                 <tr class="warning">
                     <td> 2</td>
                     <td> 冻柠乐</td>
@@ -104,12 +109,13 @@
                     <td> 18.00</td>
                     <td> 正常</td>
                 </tr>
-                <tr>
+                -->
+                <tr class="info">
                     <td>合计</td>
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td> ￥<?= number_format($ticket['total_price'], 2) ?> </td>
+                    <td> ￥<?= number_format($ticket->_total_price, 2) ?> </td>
                     <td></td>
                 </tr>
                 </tbody>

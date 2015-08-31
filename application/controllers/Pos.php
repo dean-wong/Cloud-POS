@@ -82,7 +82,6 @@ class Pos extends CI_Controller {
             $data['new_ticket']->save();
 
             redirect('pos/overview/all');
-
         }
     }
 
@@ -94,9 +93,16 @@ class Pos extends CI_Controller {
         $this->load->view('templates/footer');
     }
 
-    public function cashier()
+    /**
+     * 结账
+     * @param $ticket_id
+     */
+    public function cashier($ticket_id)
     {
         $data['title'] = 'Cashier';
+        $data['ticket'] = $this->dinningtable_model->get_Ticket($ticket_id);
+        $data['payments'] = $this->dinningtable_model->get_AllPayment();
+
         $this->load->view('templates/header', $data);
         $this->load->view('pos/cashier', $data);
         $this->load->view('templates/footer');

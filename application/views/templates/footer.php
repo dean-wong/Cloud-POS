@@ -26,6 +26,11 @@
 
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script src="<?= base_url('assets/js/ie10-viewport-bug-workaround.js') ?>"></script>
+
+<!-- -->
+<!-- <script src="<?= base_url('assets/js/icheck.min.js') ?>"></script> -->
+
 <script src="<?= base_url('assets/js/cover.js') ?>"></script>
+
 </body>
 </html>
