@@ -38,8 +38,6 @@
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="<?= site_url('') ?>"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> Cloud
                 POS</a>
@@ -51,7 +49,7 @@
                         href="<?= site_url('/pos/overview') ?>">
                         <span class="glyphicon glyphicon-th" aria-hidden="true"></span> 餐桌</a>
                 </li>
-                <li class="<?= $title == 'Order' ? 'active' : 'inactive' ?>">
+                <li class="<?= $title == 'Create' ? 'active' : 'inactive' ?>">
                     <a href=""><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> 点菜</a>
                 </li>
                 <li class="<?= $title == 'Cashier' ? 'active' : 'inactive' ?>">

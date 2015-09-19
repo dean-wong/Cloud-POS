@@ -4,9 +4,28 @@
 
         <div class="btn-toolbar">
             <div class="btn-group">
-                <a href="#" class="button button-rounded button-glow button-caution">
+                <a href="#" class="button button-glow button-rounded button-capitalize">
+                    <i class="fa fa-print"></i> 打印台单</a>
+                <?php if (!$ticket->_paid) : ?>
+                    <a href="<?= site_url('/pos/cashier/') . '/' . $ticket->_id ?>"
+                       class="button button-glow button-rounded button-highlight">
+                        <i class="fa fa-money"></i> 结账</a>
+                <?php else: ?>
+                    <a href="<?= site_url('/pos/clearance/') . '/' . $ticket->_id ?>"
+                       class="button button-glow button-rounded button-primary">
+                        <i class="fa fa-glass"></i> 清台</a>
+                <?php endif; ?>
+
+            </div>
+
+            <?php if (!$ticket->_paid) : ?>
+
+            <div class="btn-group">
+                <a href="<?= site_url('/pos/order/') . '/' . $ticket->_id ?>"
+                   class="button button-rounded button-glow button-caution">
                     <i class="fa fa-shopping-cart"></i> 加菜</a>
             </div>
+
             <!-- Single button -->
             <div class="btn-group">
                 <button type="button" class="button button-rounded button-glow button-royal dropdown-toggle"
@@ -22,15 +41,8 @@
                     <!-- <li role="separator" class="divider"></li>-->
                 </ul>
             </div>
-            <div class="btn-group">
-                <a href="#" class="button button-glow button-rounded button-capitalize">
-                    <i class="fa fa-print"></i> 打印台单</a>
-                <?php $cashier_url = site_url('/pos/cashier/') . '/' . $ticket->_id; ?>
-                <a href="<?= $cashier_url ?>" class="button button-glow button-rounded button-highlight">
-                    <i class="fa fa-money"></i> 结账</a>
-                <a href="#" class="button button-glow button-rounded button-primary">
-                    <i class="fa fa-glass"></i> 清台</a>
-            </div>
+            <?php endif; ?>
+
         </div>
 
 
@@ -59,7 +71,7 @@
                 </thead>
 
                 <tbody>
-                <?php foreach($ticket->_items as $menu) : ?>
+                <?php foreach ($ticket->_items as $menu) : ?>
                     <?php
                     $is_refunded = !empty($menu['refunded']);   // 退单
                     $is_settled = !empty($menu['settled']);     // 已经解决
@@ -69,19 +81,19 @@
                         $class_type = 'class="success"';
                         $status = '已上菜';
                     }
-                    if ($is_refunded){
+                    if ($is_refunded) {
                         $class_type = 'class="danger" style="text-decoration: line-through;"';
                         $status = '退单';
                     }
                     ?>
-                <tr <?= $class_type ?>>
-                    <td><?= $menu['id'] ?></td>
-                    <td><?= $menu['menu_name'] ?></td>
-                    <td><?= number_format($menu['unit_price'], 2) ?></td>
-                    <td><?= $menu['menu_count'] ?></td>
-                    <td><?= number_format($menu['total_price'], 2) ?></td>
-                    <td><?= $status ?></td>
-                </tr>
+                    <tr <?= $class_type ?>>
+                        <td><?= $menu['id'] ?></td>
+                        <td><?= $menu['menu_name'] ?></td>
+                        <td><?= number_format($menu['unit_price'], 2) ?></td>
+                        <td><?= $menu['menu_count'] ?></td>
+                        <td><?= number_format($menu['total_price'], 2) ?></td>
+                        <td><?= $status ?></td>
+                    </tr>
                 <?php endforeach; ?>
 
                 <!--

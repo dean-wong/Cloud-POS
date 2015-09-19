@@ -1,6 +1,7 @@
 <?php
 
-class Pos extends CI_Controller {
+class Pos extends CI_Controller
+{
 
     public function __construct()
     {
@@ -57,40 +58,55 @@ class Pos extends CI_Controller {
 
     }
 
-    /**
+    /** 创建订单（开台）
      * @param $table_id
      */
     public function create($table_id = 0)
     {
-        $data['title'] = 'Create a ticket item';
+        $data['title'] = 'Create';
         $data['menu_categories'] = $this->dinningtable_model->get_AllMenuCategory();
-        $data['new_ticket'] = $this->dinningtable_model->create_Ticket($table_id);
+        $data['cur_ticket'] = $this->dinningtable_model->create_Ticket($table_id);
 
         $this->form_validation->set_rules('menu_count', '点菜', 'required');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->load->view('templates/header', $data);
             $this->load->view('pos/create', $data);
             $this->load->view('templates/footer');
 
-        }
-        else
-        {
+        } else {
             $items = $this->input->post('menu_items');  // 获得选择的菜单ID列表
-            $data['new_ticket']->addItems($items);
-            $data['new_ticket']->save();
+            $data['cur_ticket']->addItems($items);
+            $data['cur_ticket']->insert();
 
             redirect('pos/overview/all');
         }
     }
 
-    public function order()
+    /** 修改订单（加菜）
+     * @param $ticket_id
+     */
+    public function order($ticket_id)
     {
         $data['title'] = 'Order';
-        $this->load->view('templates/header', $data);
-        $this->load->view('pos/order', $data);
-        $this->load->view('templates/footer');
+        $data['menu_categories'] = $this->dinningtable_model->get_AllMenuCategory();
+        $data['cur_ticket'] = $this->dinningtable_model->get_Ticket($ticket_id);
+
+        $this->form_validation->set_rules('menu_count', '点菜', 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->load->view('templates/header', $data);
+            $this->load->view('pos/order', $data);
+            $this->load->view('templates/footer');
+
+        } else {
+            $items = $this->input->post('menu_items');  // 获得选择的菜单ID列表
+            $data['cur_ticket']->addItems($items);
+            $data['cur_ticket']->update();
+
+            redirect('pos/overview/all');
+        }
+
     }
 
     /**
@@ -103,8 +119,29 @@ class Pos extends CI_Controller {
         $data['ticket'] = $this->dinningtable_model->get_Ticket($ticket_id);
         $data['payments'] = $this->dinningtable_model->get_AllPayment();
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('pos/cashier', $data);
-        $this->load->view('templates/footer');
+        //
+        $this->form_validation->set_rules('input-paid-amount', '付款', 'required');
+
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->load->view('templates/header', $data);
+            $this->load->view('pos/cashier', $data);
+            $this->load->view('templates/footer');
+        } else {
+            $final_paid = $this->input->post('input-final-amount'); //最终用户该付款
+            $the_payments = $this->input->post('radio_payments'); // 不同付款方式的组合
+
+            $this->dinningtable_model->checkout($data['ticket'], $the_payments, $final_paid);
+
+            redirect('pos/overview/all');
+
+        }
     }
+
+    public function clearance($ticket_id)
+    {
+        $this->dinningtable_model->clearance($ticket_id);
+        redirect('pos/overview/all');
+    }
+
 }

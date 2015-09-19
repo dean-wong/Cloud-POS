@@ -7,6 +7,8 @@ class Dinningtable_model extends CI_Model
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->load->database();
     }
 
@@ -30,6 +32,7 @@ class Dinningtable_model extends CI_Model
                 'ticket' => $ticket_id,
                 'total_price' => $is_opened ? $this->findTicket($ticket_id)['total_price'] : 0.00,
                 'create_time' => $is_opened ? $this->findTicket($ticket_id)['create_time'] : null,
+                'paid' => $is_opened ? $this->findTicket($ticket_id)['paid']:false,
             ];
 
             if ($filter == 'opened' && $is_opened) {
@@ -112,12 +115,28 @@ class Dinningtable_model extends CI_Model
             ->update('ticket_table', $data);
     }
 
+    /**
+     * @param $ticket_id
+     * 清台
+     */
+    public function clearance($ticket_id)
+    {
+        $ticket = $this->get_Ticket($ticket_id);
+
+        return $ticket->clearance();
+    }
+
     public function create_Ticket($table_id)
     {
         $ticket = new Ticket_model();
         $ticket->attachTable($table_id);
 
         return $ticket;
+    }
+
+    public function checkout ($ticket /*Ticket_model*/, $payments /*array*/, $paid_amount /*number*/)
+    {
+       return $ticket->checkout ($payments, $paid_amount);
     }
 
 
@@ -185,6 +204,5 @@ class Dinningtable_model extends CI_Model
         return null;
 
     }
-
 
 }

@@ -13,6 +13,7 @@ class Ticket_model extends CI_Model
     private $_table_name;
 
     private $_items = array();
+    private $_additional_items = array(); // 用于加菜的临时缓存数组
 
     // for Database
     private $_id;
@@ -43,6 +44,8 @@ class Ticket_model extends CI_Model
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->load->database();
 
         $this->_id = null;
@@ -90,7 +93,11 @@ class Ticket_model extends CI_Model
         $this->$property_name = $value;
     }
 
-    public function addItem($menu_id)
+    /**
+     * @param $menu_id
+     * @return int
+     */
+    private function addItem($menu_id)
     {
         // 先查找是否有这个菜，若有就+1，没有就新建一个Item加入列表
         //Todo:
@@ -118,10 +125,54 @@ class Ticket_model extends CI_Model
         return array_push($this->_items, $item);
     }
 
+    private function pushItem($menu_id)
+    {
+
+        // 先查找是否有这个菜，若有就+1，没有就新建一个Item加入列表
+        //Todo:
+        $menu_count = 1;
+
+
+        // else insert new item
+        $menu = $this->db
+            ->get_where('menu_item', ['id' => $menu_id,])
+            ->first_row();
+
+        $item = [
+            'modified_time' => date('Y-m-d H:i:s', time()),
+            'menu_id' => $menu_id,
+            'menu_count' => $menu_count,
+            'discount' => 0.0,
+            'total_price' => $menu->price * $menu_count,
+
+            'name' => $menu->name,
+        ];
+
+        // 增加订单总价
+        $this->_total_price += ($menu->price * $menu_count);
+
+        return array_push($this->_additional_items, $item);
+    }
+
+    /**
+     * @param $menus
+     */
     public function addItems($menus)
     {
-        foreach ($menus as $item) {
-            $this->addItem($item);
+        // 如果当前有数据，说明是加菜，否则就是开台
+        if (count($this->_items) > 0)
+        {
+            // 加菜
+            $this->_additional_items = array(); // 每次都会清空
+
+            foreach ($menus as $item) {
+                $this->pushItem($item);
+            }
+        }
+        else{
+            foreach ($menus as $item) {
+                $this->addItem($item);
+            }
         }
 
     }
@@ -190,16 +241,10 @@ class Ticket_model extends CI_Model
         }
     }
 
-    /**
-     * 保存到数据库当中
-     * @return bool
-     */
-    public function save()
+    private function getRowdata()
     {
-        $this->_modified_time = date('Y-m-d H:i:s', time());
-
-        // save ticket
         $data = [
+            'id' => $this->_id, // 插入的时候，这个是NULL
             'modified_time' => $this->_modified_time,
             'create_time' => $this->_create_time,
             'closing_time' => $this->_closing_time,
@@ -218,6 +263,48 @@ class Ticket_model extends CI_Model
             'ticket_type' => $this->_ticket_type,
             'owner_id' => $this->_owner_id,
         ];
+
+        return $data;
+    }
+
+    public function update()
+    {
+        $this->_modified_time = date('Y-m-d H:i:s', time());
+        $data = $this->getRowdata();
+        if (!$this->db->replace('ticket', $data)){
+            show_error('更新订单支付数据失败!');
+            return false;
+        }
+
+        foreach ($this->_additional_items as $ticket_item) {
+            $data = [
+                'modified_time' => $this->_modified_time,
+                'menu_id' => $ticket_item['menu_id'],
+                'menu_count' => $ticket_item['menu_count'],
+                'discount' => $ticket_item['discount'],
+                'total_price' => $ticket_item['total_price'],
+                'ticket_id' => $this->_id,
+                'refunded' => false,
+                'settled' => false,
+            ];
+            if (!$this->db->insert('ticket_item', $data)){
+                show_error('保存订单菜谱失败！');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 插入一个新的订单到数据库当中
+     * @return bool
+     */
+    public function insert()
+    {
+        // insert ticket
+        $this->_modified_time = date('Y-m-d H:i:s', time());
+        $data = $this->getRowdata();
 
         if (!$this->db->insert('ticket', $data)) {
             show_error('保存订单失败!');
@@ -257,6 +344,93 @@ class Ticket_model extends CI_Model
             }
 
         }
+        return true;
+
+    }
+
+    /**
+     * @param $payments
+     * @param $paid_amount
+     * @return bool
+     */
+    public function checkout($payments, $paid_amount)
+    {
+        // 由于获取的数据和数据库里面的数据顺序一样，所以ID就从1开始排列
+        $payment_id = 1;
+        $paid_count = 0.00;
+        $the_cash = 0.00;
+        foreach ($payments as $pay) {
+            $data = [
+                'ticket_id' => $this->_id,
+                'payment_id' => $payment_id,
+                'payout' => number_format($pay, 2),
+            ];
+
+            if (!$this->db->insert('ticket_payment', $data)){
+                show_error('保存支付方式列表失败！');
+                return false;
+            }
+
+            if ($payment_id === 1){
+                $the_cash = $pay;
+            }
+            $paid_count += $pay;
+            $payment_id++;
+        }
+
+        if ($paid_count > $paid_amount){
+            // 有找零，需要修改现金的支付金额数据，因为其他方式都是不找零的
+            $the_cash -= ($paid_count - $paid_amount);
+            $data = [
+                //'ticket_id' => $this->_id,
+                //'payment_id' => 1,
+                'payout' => ($the_cash > 0)?$the_cash:0, //避免保存负数
+            ];
+
+            $this->db->where('ticket_id', $this->_id);
+            $this->db->where('payment_id', 1);
+            if (!$this->db->update('ticket_payment', $data)){
+                show_error('更新现金数据失败!');
+                return false;
+            }
+        }
+
+        // 更新订单的信息
+        $this->_paid = true;
+        $this->_paid_amount = $paid_amount;
+        $this->_discount = $this->_total_price - $paid_amount; // 折扣在外部进行了重新设定
+        $this->_modified_time = date('Y-m-d H:i:s', time());
+        $this->_closing_time = date('Y-m-d H:i:s', time());
+
+        $data = $this->getRowdata();
+        if (!$this->db->replace('ticket', $data)){
+            show_error('更新订单支付数据失败!');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function clearance()
+    {
+        if (!$this->_paid){
+            show_error('没有埋单就清台!');
+            return false;
+        }
+
+        $this->_settled = true;
+        $this->_modified_time = date('Y-m-d H:i:s', time());
+        $this->_closing_time = date('Y-m-d H:i:s', time());
+
+        $data = $this->getRowdata();
+        if (!$this->db->replace('ticket', $data)){
+            show_error('更新订单数据失败!');
+            return false;
+        }
+
         return true;
 
     }

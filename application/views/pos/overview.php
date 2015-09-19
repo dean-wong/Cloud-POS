@@ -26,10 +26,10 @@
 
 
                         if ($item['ticket'] != null) {
-                            $thumb_style = ' style="background: #c1e2b3"';
+                            $thumb_style = $item['paid']?' style="background: #c1e2b3"':' style="background: #f2dede"';
                             $caption = '￥' . number_format($item['total_price'], 2);//'￥188.00';
                             $table_url = site_url('/pos/ticket') . '/' . $item['ticket'];
-                            $description = date('m/d H:m:s', strtotime($item['create_time']));
+                            $description = substr($item['create_time'], 5); //2015-09-09 12:12:12
                         }
                         ?>
 
