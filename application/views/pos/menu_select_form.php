@@ -23,12 +23,14 @@
         <label class="control-label" for="menu-list" id="menu-label"><h4>菜单 <small>总单价：<?= number_format($cur_ticket->_total_price, 2) ?></small></h4></label>
         <div class="controls">
             <div class="list-group" id="menu-list">
-                <?php $item_colos = ['list-group-item-success', 'list-group-item-info', 'list-group-item-warning', 'list-group-item-danger']; ?>
+
+            </div>
+            <div class="list-group">
                 <?php foreach ($cur_ticket->_items as $item) : ?>
-                    <div class="list-group-item <?= $item_colos[($item['menu_id']) % 4] ?>" value="<?= $item['menu_id'] ?>">
+                    <div class="list-group-item" value="<?= $item['menu_id'] ?>">
                         <span class="badge"><?= $item['menu_count'] ?></span>
-                        <h4 class="list-group-item-heading"><?= $item['menu_name'] ?></h4>
-                        <p class="list-group-item-text">￥<?= number_format($item['total_price'], 2) ?></p>
+                        <?= $item['menu_name'] ?>
+                        <small>￥<?= number_format($item['total_price'], 2) ?></small>
                     </div>
                 <?php endforeach; ?>
             </div>

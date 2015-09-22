@@ -23,7 +23,7 @@ $(function () {
 
 });
 
-function setPayment(the_button, payment_id)
+function setPayment(sender, payment_id)
 {
     //表示当前的付款方式
     $("#current-payment-id").val(payment_id);
@@ -31,10 +31,10 @@ function setPayment(the_button, payment_id)
     // 更新界面的激活状态
     var payment_group = $("#payment-group");
     payment_group.find("button").attr("class","list-group-item");
-    $(the_button).attr("class","list-group-item active");
+    $(sender).attr("class","list-group-item active");
 
     // 改变金额输入中的数据
-    $("#input-cash").val($(the_button).val());
+    $("#input-cash").val($(sender).val());
 
 }
 
@@ -101,12 +101,13 @@ function addMenu(menu_id, menu_name, menu_price)
      */
     // 在菜单列表中添加一项
     var menu_list = $("#menu-list");
-    var item_colos = ['list-group-item-success', 'list-group-item-info', 'list-group-item-warning', 'list-group-item-danger'];
-    var count = Number($("#menu_count").val()) + 1;
+    var item_colors = ['list-group-item-success', 'list-group-item-info', 'list-group-item-warning', 'list-group-item-danger'];
 
-    var text = '<div class="list-group-item ' + item_colos[menu_id % 4] + '" value="' + menu_id + '">' +
+    var text = '<div class="list-group-item ' + item_colors[menu_id % 4] + '" value="' + menu_id + '">' +
         '<span class="badge">1</span>' +
         '<h4 class="list-group-item-heading">' + menu_name + '</h4>' +
+        '<button type="button" class="close" aria-label="Close" '+
+            'onclick=javascript:removeMenu(this,"'+ menu_id +'","'+ menu_price + '")><span aria-hidden="true">&times;</span></button>' +
         '<p class="list-group-item-text">￥' + menu_price + '</p>' +
         '</div>';
 
@@ -114,7 +115,6 @@ function addMenu(menu_id, menu_name, menu_price)
 
     // 动态计算总价
     var price = Number($("#total_price").val()) + Number(menu_price);
-    //var discount = Number($("#discount").val());
     // <h4>菜单 <small>总金额：0.00 优惠金额：0.00</small></h4>
     text = '<h4>菜单 <small>总单价：<strong>' + price.toFixed(2) + '</strong></small></h4>';
     $("#menu-label").html(text);
@@ -126,6 +126,8 @@ function addMenu(menu_id, menu_name, menu_price)
     /*
      * 保存提交表单的数据
      */
+    var count = Number($("#menu_count").val()) + 1;
+
     // 保存当前的点菜数量记数
     $("#menu_count").val(count);
     // 保存Menu ID到变量数组当中，给表单提交之用
@@ -138,3 +140,41 @@ function addMenu(menu_id, menu_name, menu_price)
 
 }
 
+function removeMenu(sender, menu_id, menu_price)
+{
+    //alert("remove menu:"+menu_id +' item:'+ $(sender).text() + ' price:' + menu_price);
+
+    // 清除界面元素
+    var list_item = $(sender).parent();
+    list_item.remove();
+
+    // 修改数据，包括总价 ，菜品个数等等
+    var price = Number($("#total_price").val()) - Number(menu_price);
+    // <h4>菜单 <small>总金额：0.00 优惠金额：0.00</small></h4>
+    text = '<h4>菜单 <small>总单价：<strong>' + price.toFixed(2) + '</strong></small></h4>';
+    $("#menu-label").html(text);
+
+    // 保存当前总价格，便于下次计算
+    $("#total_price").val(price);
+
+    /*
+     * 保存提交表单的数据
+     */
+    var count = Number($("#menu_count").val()) - 1;
+
+    // 保存当前的点菜数量记数
+    $("#menu_count").val(count);
+
+    // 删除隐藏的Input数组
+    // '<input class="sr-only" type="text" name="menu_items[]" value="' + menu_id + '"/>';
+    $("#menu_count").siblings(".sr-only").each(function(){
+        var current_id = Number($(this).val());
+        if (current_id == menu_id){
+            $(this).remove();
+            return false;
+        }
+    });
+
+    if (count < 1)
+        $("#order-btn").attr("disabled", "disabled");
+}
