@@ -9,18 +9,6 @@ $(function () {
         '#tabMenuGroup-7,#tabMenuGroup-8,#tabMenuGroup-9,#tabMenuGroup-10,#tabMenuGroup-11,#tabMenuGroup-12,' +
         '#discount-tabs').tabs();
 
-    // customize all inputs (will search for checkboxes and radio buttons)
-    /*$('input').iCheck({
-     checkboxClass: 'icheckbox_minimal',
-     radioClass: 'iradio_minimal',
-     increaseArea: '20%'
-     });*/
-
-    // Buttonset
-    //$('#discount-group').buttonset();
-    //$('#payment-group').buttonset();
-
-
 });
 
 function setPayment(sender, payment_id)
@@ -136,8 +124,6 @@ function addMenu(menu_id, menu_name, menu_price)
 
     // <button class="btn btn-success btn-block" id="order-btn" disabled>下单</button>
     $("#order-btn").removeAttr("disabled");
-
-
 }
 
 function removeMenu(sender, menu_id, menu_price)
